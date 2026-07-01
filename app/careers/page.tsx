@@ -82,7 +82,7 @@ export default function CareersPage() {
                 placeholder="What do you want to do?" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-800 shadow-sm outline-none transition focus:border-accent"
+                className="w-full rounded-2xl border border-zinc-200 bg-white p-4 text-base text-zinc-800 shadow-sm outline-none transition focus:border-accent"
               />
             </div>
           </aside>
@@ -97,7 +97,7 @@ export default function CareersPage() {
                 placeholder="What do you want to do?" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-800 shadow-sm outline-none transition focus:border-accent"
+                className="w-full rounded-2xl border border-zinc-200 bg-white p-4 text-base text-zinc-800 shadow-sm outline-none transition focus:border-accent"
               />
             </div>
 
@@ -127,25 +127,25 @@ export default function CareersPage() {
                       key={career.id} 
                       variants={reveal}
                       layout
-                      className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm sm:p-8"
+                      className="group flex flex-col gap-6 rounded-[28px] border border-zinc-200 bg-white p-6 shadow-sm transition duration-300 hover:border-accent hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-8"
                     >
                       {/* Job Header */}
-                      <div className="flex items-start justify-between gap-4">
-                        <h2 className="font-display text-2xl font-normal text-zinc-900 md:text-3xl">
+                      <div className="flex flex-col-reverse items-start justify-between gap-4 sm:flex-row">
+                        <h2 className="font-display text-2xl font-bold text-zinc-900 md:text-3xl">
                           {career.title}
                         </h2>
-                        <div className="flex shrink-0 items-center gap-2 text-zinc-500">
-                          <button className="grid size-10 place-items-center rounded-full transition hover:bg-zinc-100 hover:text-zinc-900">
+                        <div className="flex shrink-0 items-center gap-2 text-zinc-500 self-end sm:self-auto">
+                          <button className="grid size-10 place-items-center rounded-full transition hover:bg-accent/10 hover:text-accent">
                             <Share2 size={20} />
                           </button>
-                          <button className="grid size-10 place-items-center rounded-full transition hover:bg-zinc-100 hover:text-zinc-900">
+                          <button className="grid size-10 place-items-center rounded-full transition hover:bg-accent/10 hover:text-accent">
                             <Bookmark size={20} />
                           </button>
                         </div>
                       </div>
 
                       {/* Job Meta Info */}
-                      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm font-medium text-zinc-600">
+                      <div className="mt-2 flex flex-wrap items-center gap-4 text-sm font-semibold text-zinc-500">
                         <div className="flex items-center gap-1.5">
                           <Building2 size={16} className="text-zinc-400" />
                           DevSoc, {career.department || "General"}
@@ -157,7 +157,7 @@ export default function CareersPage() {
                       </div>
 
                       {/* Divider */}
-                      <div className="my-6 h-px w-full bg-zinc-100" />
+                      <div className="h-px w-full bg-zinc-100" />
 
                       {/* Minimum Qualifications */}
                       <div className="text-zinc-800">
