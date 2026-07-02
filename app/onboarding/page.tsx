@@ -46,6 +46,7 @@ export default function OnboardingPage() {
         year: formData.year,
         classSection: formData.classSection,
         department: formData.department,
+        role: "user",
         onboardingCompleted: true,
         createdAt: new Date(),
       }, { merge: true });

@@ -53,6 +53,7 @@ export default function Login() {
           name: user.displayName || "Unknown",
           email: email.toLowerCase(),
           contact: phone,
+          role: "user",
           createdAt: new Date().toISOString(),
           source: "google",
         });
