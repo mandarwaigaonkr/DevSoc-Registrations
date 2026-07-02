@@ -113,7 +113,7 @@ export default function Home() {
         <div className="container-main">
           <SectionHeader eyebrow="Benefits" title="Why Join DevSoc?" />
 
-          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} className="mt-16 grid gap-8 md:grid-cols-3">
+          <motion.div variants={stagger} initial="hidden" animate="show" viewport={{ once: true, amount: 0.15 }} className="mt-16 grid gap-8 md:grid-cols-3">
             {[
               { icon: <Zap className="text-accent" size={32} />, title: "Real-world Projects", desc: "Stop building to-do apps. Build software that actually gets used by thousands of students on campus." },
               { icon: <MessageSquare className="text-accent" size={32} />, title: "Mentorship", desc: "Learn from seniors who have cracked top internships and mastered industry-standard tech stacks." },
@@ -136,7 +136,7 @@ export default function Home() {
         <div className="container-main">
           <SectionHeader eyebrow="Departments" title="Find your fit" />
 
-          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} className="mt-16 grid gap-6 md:grid-cols-3">
+          <motion.div variants={stagger} initial="hidden" animate="show" viewport={{ once: true, amount: 0.15 }} className="mt-16 grid gap-6 md:grid-cols-3">
             {[
               { icon: <Code2 size={24} />, name: "Technical", roles: "Frontend, Backend, DevOps" },
               { icon: <PenTool size={24} />, name: "Design", roles: "UI/UX, Graphic Design" },
@@ -158,7 +158,7 @@ export default function Home() {
       <section className="section-pad pb-32">
         <div className="container-main grid gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-24">
           <SectionHeader eyebrow="Process" title="How to get recruited" className="lg:sticky lg:top-32 lg:self-start lg:text-left" />
-          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} className="grid gap-5">
+          <motion.div variants={stagger} initial="hidden" animate="show" viewport={{ once: true, amount: 0.15 }} className="grid gap-5">
             {processSteps.map(([num, title, description]) => (
               <motion.article key={title} variants={reveal} className="rounded-[28px] p-8 md:p-10 bg-white border border-zinc-100 shadow-sm transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <span className="inline-flex min-h-10 flex-wrap items-center gap-2 rounded-pill bg-accent px-4 font-display text-base font-bold text-white shadow-primary md:min-h-11 md:gap-4 md:px-6 md:text-lg">
