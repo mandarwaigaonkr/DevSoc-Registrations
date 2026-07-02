@@ -40,7 +40,7 @@ export default function ApplyPage() {
       try {
         // 1. Fetch user data
         const userDoc = await getDoc(doc(db, "users", u.uid));
-        const uData = userDoc.exists() ? userDoc.data() : { name: u.displayName, email: u.email, course: "", year: "" };
+        const uData = userDoc.exists() ? userDoc.data() : { name: u.displayName, email: u.email, department: "", year: "", regNo: "" };
         setUserData({ uid: u.uid, ...uData });
 
         // 2. Fetch career data
@@ -84,21 +84,21 @@ export default function ApplyPage() {
         careerId: id,
         careerTitle: career.title,
         applicantDetails: {
-          name: userData.name,
-          email: userData.email,
-          studentId: userData.studentId || "",
-          course: userData.course,
-          year: userData.year,
-          phone,
-          alternateEmail
+          name: userData.name || "",
+          email: userData.email || "",
+          studentId: userData.regNo || "",
+          department: userData.department || "",
+          year: userData.year || "",
+          phone: phone || "",
+          alternateEmail: alternateEmail || ""
         },
         professionalLinks: {
-          resumeLink,
-          github,
-          linkedin,
-          portfolio
+          resumeLink: resumeLink || "",
+          github: github || "",
+          linkedin: linkedin || "",
+          portfolio: portfolio || ""
         },
-        customAnswers,
+        customAnswers: customAnswers || {},
         status: "Submitted",
         submittedAt: serverTimestamp(),
       });
@@ -162,8 +162,8 @@ export default function ApplyPage() {
                   <p className="font-semibold text-ink">{userData?.email}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-zinc-500 font-medium">Course</p>
-                  <p className="font-semibold text-ink">{userData?.course || "Not specified"}</p>
+                  <p className="text-zinc-500 font-medium">Department</p>
+                  <p className="font-semibold text-ink">{userData?.department || "Not specified"}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-zinc-500 font-medium">Year</p>
