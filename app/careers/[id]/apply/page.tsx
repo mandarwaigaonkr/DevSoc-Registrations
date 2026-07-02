@@ -250,18 +250,18 @@ export default function ApplyPage() {
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-4">Contact Info</h3>
                 <div className="grid gap-4 md:grid-cols-2 text-sm bg-zinc-50 p-5 rounded-2xl border border-zinc-100">
-                  <div><span className="text-zinc-500 font-medium block">Phone</span><span className="font-semibold">{phone}</span></div>
-                  {alternateEmail && <div><span className="text-zinc-500 font-medium block">Alt Email</span><span className="font-semibold">{alternateEmail}</span></div>}
+                  <div className="min-w-0"><span className="text-zinc-500 font-medium block">Phone</span><span className="font-semibold break-words">{phone}</span></div>
+                  {alternateEmail && <div className="min-w-0"><span className="text-zinc-500 font-medium block">Alt Email</span><span className="font-semibold break-all">{alternateEmail}</span></div>}
                 </div>
               </div>
 
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-4">Links</h3>
                 <div className="grid gap-4 md:grid-cols-2 text-sm bg-zinc-50 p-5 rounded-2xl border border-zinc-100">
-                  {career?.resumeRequired && <div><span className="text-zinc-500 font-medium block">Resume</span><a href={resumeLink} target="_blank" className="font-semibold text-accent hover:underline truncate block">{resumeLink}</a></div>}
-                  {linkedin && <div><span className="text-zinc-500 font-medium block">LinkedIn</span><a href={linkedin} target="_blank" className="font-semibold text-accent hover:underline truncate block">{linkedin}</a></div>}
-                  {github && <div><span className="text-zinc-500 font-medium block">GitHub</span><a href={github} target="_blank" className="font-semibold text-accent hover:underline truncate block">{github}</a></div>}
-                  {portfolio && <div><span className="text-zinc-500 font-medium block">Portfolio</span><a href={portfolio} target="_blank" className="font-semibold text-accent hover:underline truncate block">{portfolio}</a></div>}
+                  {career?.resumeRequired && <div className="min-w-0"><span className="text-zinc-500 font-medium block">Resume</span><a href={resumeLink} target="_blank" className="font-semibold text-accent hover:underline truncate block">{resumeLink}</a></div>}
+                  {linkedin && <div className="min-w-0"><span className="text-zinc-500 font-medium block">LinkedIn</span><a href={linkedin} target="_blank" className="font-semibold text-accent hover:underline truncate block">{linkedin}</a></div>}
+                  {github && <div className="min-w-0"><span className="text-zinc-500 font-medium block">GitHub</span><a href={github} target="_blank" className="font-semibold text-accent hover:underline truncate block">{github}</a></div>}
+                  {portfolio && <div className="min-w-0"><span className="text-zinc-500 font-medium block">Portfolio</span><a href={portfolio} target="_blank" className="font-semibold text-accent hover:underline truncate block">{portfolio}</a></div>}
                 </div>
               </div>
 
