@@ -29,14 +29,13 @@ export default function Home() {
          return;
       }
   
+      // Record minimal user info and direct to careers page
       const userDocRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userDocRef);
-      
-      if (userSnap.exists() && userSnap.data().onboardingCompleted) {
-         router.push("/profile");
-      } else {
-         router.push("/onboarding");
-      }
+      // Wait for 1s to allow smooth state transition
+      setTimeout(() => {
+        router.push("/careers");
+      }, 1000);
     } catch (error: any) {
       console.error(error);
       if (error.code !== "auth/popup-closed-by-user") {

@@ -12,11 +12,11 @@ import { useRouter } from "next/navigation";
 
 function Logo() {
   return (
-    <a href="/" className="group flex items-center gap-3 rounded-pill focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-      <span className="relative grid size-11 place-items-center">
-        <img src="/devs-logo-static.svg" alt="DevS Logo" className="size-11" />
+    <a href="/" className="group flex shrink-0 items-center gap-2 sm:gap-3 rounded-pill focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+      <span className="relative grid size-10 sm:size-11 place-items-center">
+        <img src="/devs-logo-static.svg" alt="DevS Logo" className="size-10 sm:size-11" />
       </span>
-      <span className="font-display text-sm font-bold tracking-normal text-ink">
+      <span className="font-display text-xs sm:text-sm font-bold tracking-normal text-ink hidden min-[360px]:block">
         <RollingText>Developer Society</RollingText>
       </span>
     </a>
@@ -90,7 +90,7 @@ export function Nav() {
         <nav
           aria-label="Primary"
           className={cn(
-            "flex min-h-[56px] items-center gap-7 rounded-pill bg-white px-3 shadow-[0_1px_20px_rgba(24,24,27,0.04)] transition md:px-4 md:pr-4",
+            "flex min-h-[56px] max-w-full items-center gap-2 sm:gap-7 rounded-pill bg-white px-2 py-1 shadow-[0_1px_20px_rgba(24,24,27,0.04)] transition sm:px-4 sm:pr-4",
             scrolled ? "border border-zinc-200/70" : "border border-transparent"
           )}
         >
@@ -99,7 +99,7 @@ export function Nav() {
           <button
             onClick={handleAuthAction}
             disabled={loading}
-            className="group flex h-10 items-center justify-center rounded-pill bg-zinc-100 px-5 text-sm font-semibold text-ink transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="group flex h-9 sm:h-10 shrink-0 items-center justify-center rounded-pill bg-zinc-100 px-4 sm:px-5 text-xs sm:text-sm font-semibold text-ink transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <RollingText>
               {loading ? "Wait..." : user ? "My Profile" : "Login"}
