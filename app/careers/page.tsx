@@ -126,7 +126,6 @@ export default function CareersPage() {
                     <motion.article 
                       key={career.id} 
                       variants={reveal}
-                      layout
                       className="group flex flex-col gap-6 rounded-[28px] border border-zinc-200 bg-white p-6 shadow-sm transition duration-300 hover:border-accent hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-8"
                     >
                       {/* Job Header */}

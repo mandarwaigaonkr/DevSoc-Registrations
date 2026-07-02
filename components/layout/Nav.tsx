@@ -7,8 +7,9 @@ import { cn } from "@/lib/utils";
 import RollingText from "@/components/ui/RollingText";
 import { auth, db, googleProvider } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import type { User } from "firebase/auth";
 
 function Logo() {
   return (
@@ -25,7 +26,8 @@ function Logo() {
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -37,10 +39,27 @@ export function Nav() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+    let roleUnsub: (() => void) | null = null;
+
+    const authUnsub = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
+      // Tear down any previous role listener
+      if (roleUnsub) { roleUnsub(); roleUnsub = null; }
+
+      if (currentUser) {
+        // Real-time listener — picks up role changes without re-login
+        roleUnsub = onSnapshot(doc(db, "users", currentUser.uid), (snap) => {
+          setIsAdmin(snap.exists() && snap.data()?.role === "admin");
+        });
+      } else {
+        setIsAdmin(false);
+      }
     });
-    return () => unsubscribe();
+
+    return () => {
+      authUnsub();
+      if (roleUnsub) roleUnsub();
+    };
   }, []);
 
   async function handleAuthAction() {
@@ -90,12 +109,30 @@ export function Nav() {
         <nav
           aria-label="Primary"
           className={cn(
-            "flex min-h-[56px] max-w-full items-center gap-2 sm:gap-7 rounded-pill bg-white px-2 py-1 shadow-[0_1px_20px_rgba(24,24,27,0.04)] transition sm:px-4 sm:pr-4",
+            "flex min-h-[56px] max-w-full items-center gap-2 sm:gap-4 rounded-pill bg-white px-2 py-1 shadow-[0_1px_20px_rgba(24,24,27,0.04)] transition sm:px-4 sm:pr-4",
             scrolled ? "border border-zinc-200/70" : "border border-transparent"
           )}
         >
           <Logo />
-          
+
+          {user && (
+            <a
+              href="/careers"
+              className="hidden sm:flex h-9 sm:h-10 items-center justify-center rounded-pill px-4 text-xs sm:text-sm font-semibold text-zinc-600 transition hover:text-ink"
+            >
+              Open Positions
+            </a>
+          )}
+
+          {isAdmin && (
+            <a
+              href="/admin/dashboard"
+              className="hidden sm:flex h-9 sm:h-10 items-center justify-center rounded-pill px-4 text-xs sm:text-sm font-semibold text-accent transition hover:text-accent/80"
+            >
+              Admin
+            </a>
+          )}
+
           <button
             onClick={handleAuthAction}
             disabled={loading}
@@ -110,3 +147,4 @@ export function Nav() {
     </motion.header>
   );
 }
+

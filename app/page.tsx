@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { reveal, stagger } from "@/lib/animations";
 import { Button } from "@/components/ui/Button";
 import { auth, googleProvider, db } from "@/lib/firebase";
@@ -11,31 +11,40 @@ import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import RollingText from "@/components/ui/RollingText";
 import { Code2, PenTool, LayoutTemplate, MessageSquare, Briefcase, Zap } from "lucide-react";
+import type { User } from "firebase/auth";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null | undefined>(undefined); // undefined = resolving
   const router = useRouter();
 
-  async function handleLogin() {
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((u) => setCurrentUser(u));
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = useCallback(async () => {
     try {
       setLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      
+
       if (!user.email?.includes("christuniversity.in")) {
-         alert("Please login using your Christ University email ID.");
-         await auth.signOut();
-         setLoading(false);
-         return;
+        alert("Please login using your Christ University email ID.");
+        await auth.signOut();
+        setLoading(false);
+        return;
       }
-  
-      // Record minimal user info and direct to careers page
+
       const userDocRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userDocRef);
-      // Wait for 1s to allow smooth state transition
       setTimeout(() => {
-        router.push("/careers");
-      }, 1000);
+        if (userSnap.exists() && userSnap.data().onboardingCompleted) {
+          router.push("/careers");
+        } else {
+          router.push("/onboarding");
+        }
+      }, 800);
     } catch (error: any) {
       console.error(error);
       if (error.code !== "auth/popup-closed-by-user") {
@@ -43,14 +52,16 @@ export default function Home() {
       }
       setLoading(false);
     }
-  }
+  }, [router]);
+
+  const authReady = currentUser !== undefined;
 
   return (
     <main>
       {/* Hero Section */}
       <section className="container-main pt-24 md:pt-32 pb-20">
         <motion.div variants={stagger} initial="hidden" animate="show" className="grid items-center gap-12 pt-4 lg:grid-cols-[auto_1fr] lg:gap-20">
-          <motion.div variants={reveal} className="mx-auto hidden md:flex w-fit flex-col items-center gap-5 rounded-[32px] bg-white p-6 shadow-[0_4px_48px_rgba(0,0,0,0.07)] md:p-8 lg:mx-0">
+          <motion.div variants={reveal} className="mx-auto hidden md:flex w-fit flex-col items-center gap-5 rounded-[32px] bg-white p-6 shadow-[0_2px_24px_rgba(0,0,0,0.06)] md:p-8 lg:mx-0">
             <div className="grid size-[140px] place-items-center rounded-2xl bg-zinc-50 p-4 md:size-[180px]">
               <Image src="/devs-logo.svg" alt="Developer Society logo" width={180} height={180} className="h-full w-full object-contain" priority />
             </div>
@@ -69,19 +80,30 @@ export default function Home() {
             <motion.p variants={reveal} className="mt-6 text-lg text-zinc-600 max-w-2xl mx-auto lg:mx-0">
               We are a collective of developers, designers, and innovators at Christ University building real-world software and pushing boundaries.
             </motion.p>
-            <motion.div variants={reveal} className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:mt-10 lg:justify-start">
-              <Button onClick={handleLogin} disabled={loading}>
-                <RollingText>
-                  {loading ? "Connecting..." : "Login with Google"}
-                </RollingText>
-              </Button>
+            <motion.div variants={reveal} className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:mt-10 lg:justify-start" style={{ minHeight: 56 }}>
+              {authReady && (
+                currentUser ? (
+                  <>
+                    <Button onClick={() => router.push("/careers")}>
+                      <RollingText>View Open Positions</RollingText>
+                    </Button>
+                    <Button variant="secondary" onClick={() => router.push("/profile")} icon={false}>
+                      My Profile
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={handleLogin} disabled={loading}>
+                    <RollingText>{loading ? "Connecting..." : "Login with Google"}</RollingText>
+                  </Button>
+                )
+              )}
             </motion.div>
           </div>
         </motion.div>
       </section>
 
       {/* Why Join Us */}
-      <section className="bg-white py-24 border-y border-zinc-100">
+      <section className="bg-white py-24 border-y border-zinc-100" style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
         <div className="container-main">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger} className="text-center max-w-2xl mx-auto">
             <motion.h2 variants={reveal} className="font-display text-4xl font-bold text-ink">Why Join DevSoc?</motion.h2>
@@ -107,7 +129,7 @@ export default function Home() {
       </section>
 
       {/* Our Teams */}
-      <section className="py-24">
+      <section className="py-24" style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
         <div className="container-main">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger} className="text-center max-w-2xl mx-auto">
             <motion.h2 variants={reveal} className="font-display text-4xl font-bold text-ink">Open Departments</motion.h2>
@@ -131,9 +153,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-      
+
       {/* The Process */}
-      <section className="bg-ink py-24 text-white">
+      <section className="bg-ink py-24 text-white" style={{ contentVisibility: "auto", containIntrinsicSize: "0 400px" }}>
         <div className="container-main text-center">
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="font-display text-4xl font-bold">The Process</motion.h2>
           <div className="mt-16 grid gap-12 md:grid-cols-3 relative">
@@ -157,3 +179,4 @@ export default function Home() {
     </main>
   );
 }
+
