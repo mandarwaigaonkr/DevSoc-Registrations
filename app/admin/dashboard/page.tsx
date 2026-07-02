@@ -21,7 +21,7 @@ import {
 } from "firebase/firestore";
 
 import { reveal, stagger } from "@/lib/animations";
-import { Plus, Trash2, CheckCircle, Loader2, LogOut, FileText, Search, Edit2 } from "lucide-react";
+import { Plus, Trash2, CheckCircle, Loader2, LogOut, FileText, Search, Edit2, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Career {
@@ -83,7 +83,7 @@ interface AdminRequest {
 
 const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year"];
 const DEPARTMENTS = ["Technical", "Design", "Management", "Content", "Operations"];
-const APPLICATION_STATUSES = ["Submitted", "Under Review", "Shortlisted", "Interview Scheduled", "Selected", "Rejected"];
+const APPLICATION_STATUSES = ["Submitted", "Under Review", "Shortlisted", "Waitlisted", "Interview Scheduled", "Selected", "Rejected"];
 
 const emptyForm = {
   title: "",
@@ -301,6 +301,60 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error(error);
       alert("Failed to update status");
+    }
+  }
+
+  /* ── Export Shortlisted Applications ── */
+  async function handleExportCSV() {
+    try {
+      // Query all Shortlisted applications
+      const q = query(
+        collection(db, "applications"),
+        where("status", "==", "Shortlisted")
+      );
+      const snap = await getDocs(q);
+      const exportApps = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Application[];
+
+      if (exportApps.length === 0) {
+        alert("No shortlisted applications found to export.");
+        return;
+      }
+
+      const headers = ["Name", "Email", "Phone", "Student ID", "Department", "Year", "Role", "Status", "Resume", "GitHub", "LinkedIn", "Portfolio"];
+      
+      const escapeCsv = (str: string | undefined) => {
+        if (!str) return '""';
+        return `"${str.replace(/"/g, '""')}"`;
+      };
+
+      const rows = exportApps.map(app => [
+        escapeCsv(app.applicantDetails.name),
+        escapeCsv(app.applicantDetails.email),
+        escapeCsv(app.applicantDetails.phone),
+        escapeCsv(app.applicantDetails.studentId),
+        escapeCsv(app.applicantDetails.course),
+        escapeCsv(app.applicantDetails.year),
+        escapeCsv(app.careerTitle),
+        escapeCsv(app.status),
+        escapeCsv(app.professionalLinks.resumeLink),
+        escapeCsv(app.professionalLinks.github),
+        escapeCsv(app.professionalLinks.linkedin),
+        escapeCsv(app.professionalLinks.portfolio)
+      ].join(','));
+
+      const csvContent = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `shortlisted_candidates_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    } catch (error) {
+      console.error(error);
+      alert("Failed to export applications.");
     }
   }
 
@@ -582,6 +636,16 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-zinc-500">Showing {applications.length} applications</p>
+                    <button
+                      onClick={handleExportCSV}
+                      className="flex items-center gap-2 rounded-pill bg-white border border-zinc-200 px-4 py-2 text-sm font-bold text-ink shadow-sm transition hover:bg-zinc-50 hover:-translate-y-0.5"
+                    >
+                      <Download size={16} />
+                      Export Shortlisted
+                    </button>
+                  </div>
                   <div className="overflow-x-auto rounded-[20px] border border-zinc-200 bg-white shadow-sm">
                     <table className="w-full text-left text-sm">
                       <thead className="bg-zinc-50 text-zinc-600">
