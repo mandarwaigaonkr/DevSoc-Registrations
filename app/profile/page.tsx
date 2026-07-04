@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/Button";
 import { reveal, stagger } from "@/lib/animations";
 import { Loader2, FileText, ChevronDown, ChevronUp } from "lucide-react";
@@ -53,6 +53,17 @@ export default function ProfilePage() {
   async function handleLogout() {
     await auth.signOut();
     router.push("/");
+  }
+
+  async function handleWithdraw(appId: string) {
+    if (!confirm("Are you sure you want to withdraw this application? This cannot be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "applications", appId));
+      setApplications(prev => prev.filter(app => app.id !== appId));
+    } catch (error) {
+      console.error("Failed to withdraw", error);
+      alert("Failed to withdraw application.");
+    }
   }
 
   if (loading) {
@@ -174,6 +185,15 @@ export default function ProfilePage() {
                                       </div>
                                     </div>
                                   )}
+                                    
+                                  <div className="md:col-span-2 pt-4 border-t border-zinc-100 flex justify-end">
+                                    <button
+                                      onClick={() => handleWithdraw(app.id)}
+                                      className="rounded-pill border border-red-200 bg-red-50/30 px-5 py-2 text-sm font-semibold text-red-600 shadow-sm transition hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                                    >
+                                      Withdraw Application
+                                    </button>
+                                  </div>
                                   
                                 </div>
                               </motion.div>
