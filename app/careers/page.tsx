@@ -71,12 +71,14 @@ export default function CareersPage() {
               </>
             )}
           </div>
-          <button 
-            onClick={() => setSearchQuery("")}
-            className="self-start rounded-pill border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50 md:self-auto"
-          >
-            Clear filters
-          </button>
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery("")}
+              className="self-start rounded-pill border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50 md:self-auto"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[280px_1fr]">
