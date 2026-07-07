@@ -39,3 +39,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+dev-soc-registrations-77b56de5e983.json
+gdrive_implementation.txt

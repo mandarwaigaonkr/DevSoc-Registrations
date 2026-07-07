@@ -83,7 +83,7 @@ export default function ApplyPage() {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await addDoc(collection(db, "applications"), {
+      const docRef = await addDoc(collection(db, "applications"), {
         userId: userData.uid,
         careerId: id,
         careerTitle: career.title,
