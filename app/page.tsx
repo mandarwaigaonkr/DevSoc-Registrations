@@ -65,7 +65,7 @@ export default function Home() {
   return (
     <main>
       {/* Hero Section matching DevSoc Website */}
-      <section className="container-main pt-36 md:pt-40 pb-24 md:pb-40">
+      <section className="container-main pt-28 md:pt-32 pb-16 md:pb-24">
         <motion.div variants={stagger} initial="hidden" animate="show" className="grid items-start gap-12 pt-4 lg:grid-cols-[auto_1fr] lg:gap-20">
           
           {/* Floating brand card — left */}
@@ -115,7 +115,7 @@ export default function Home() {
       </section>
 
       {/* Why Join Us */}
-      <section className="bg-zinc-50/50 py-24 md:py-32 border-y border-zinc-100">
+      <section className="bg-zinc-50/50 py-16 md:py-20 border-y border-zinc-100">
         <div className="container-main">
           <SectionHeader eyebrow="Benefits" title="Why Join DevSoc?" />
 
@@ -138,7 +138,7 @@ export default function Home() {
       </section>
 
       {/* Our Teams */}
-      <section className="py-24 md:py-32">
+      <section className="py-16 md:py-20">
         <div className="container-main">
           <SectionHeader eyebrow="Departments" title="Find your fit" />
 
@@ -161,7 +161,7 @@ export default function Home() {
       </section>
 
       {/* The Process - matching DevSoc Website design */}
-      <section className="section-pad pb-32">
+      <section className="py-16 md:py-24">
         <div className="container-main grid gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-24">
           <SectionHeader eyebrow="Process" title="How to get recruited" className="lg:sticky lg:top-32 lg:self-start lg:text-left" />
           <motion.div variants={stagger} initial="hidden" animate="show" viewport={{ once: true, amount: 0.15 }} className="grid gap-5">
