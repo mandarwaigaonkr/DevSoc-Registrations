@@ -81,7 +81,7 @@ interface AdminRequest {
   uid?: string;
 }
 
-const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year"];
+const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 const DEPARTMENTS = ["Technical", "Design", "Management", "Content", "Operations"];
 const APPLICATION_STATUSES = ["Submitted", "Under Review", "Shortlisted", "Waitlisted", "Interview Scheduled", "Selected", "Rejected"];
 
