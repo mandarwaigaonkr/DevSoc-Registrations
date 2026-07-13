@@ -803,7 +803,7 @@ export default function AdminDashboard() {
                         {Object.entries(selectedApp.customAnswers).map(([q, a]) => (
                           <div key={q} className="rounded-xl bg-zinc-50 p-4 border border-zinc-100">
                             <p className="text-sm font-semibold text-ink mb-1">{q}</p>
-                            <p className="text-sm text-zinc-600 whitespace-pre-wrap">{a}</p>
+                            <p className="text-sm text-zinc-600 whitespace-pre-wrap break-words">{a}</p>
                           </div>
                         ))}
                       </div>

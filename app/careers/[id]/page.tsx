@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
@@ -25,13 +26,28 @@ interface Career {
   selectionProcess?: string;
 }
 
+const fetchCareer = async (id: string) => {
+  const docRef = doc(db, "careers", id);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() } as Career;
+  }
+  throw new Error("Career not found");
+};
+
+const checkApplicationStatus = async ([_, userId, careerId]: [string, string, string]) => {
+  const q = query(
+    collection(db, "applications"),
+    where("userId", "==", userId),
+    where("careerId", "==", careerId)
+  );
+  const snap = await getDocs(q);
+  return !snap.empty;
+};
+
 export default function CareerDetailsPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const [career, setCareer] = useState<Career | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [hasApplied, setHasApplied] = useState(false);
-  const [checkingApplication, setCheckingApplication] = useState(true);
   const [userLoading, setUserLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
@@ -43,48 +59,23 @@ export default function CareerDetailsPage() {
     return () => unsub();
   }, []);
 
-  useEffect(() => {
-    async function fetchCareer() {
-      if (!id) return;
-      try {
-        const docRef = doc(db, "careers", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setCareer({ id: docSnap.id, ...docSnap.data() } as Career);
-        } else {
-          router.replace("/careers");
-        }
-      } catch (error) {
-        console.error("Error fetching career:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCareer();
-  }, [id, router]);
+  const { data: career, error: careerError, isLoading: loading } = useSWR(
+    id ? id : null,
+    fetchCareer
+  );
 
   useEffect(() => {
-    async function checkApplication() {
-      if (!user || !id) {
-        setCheckingApplication(false);
-        return;
-      }
-      try {
-        const q = query(
-          collection(db, "applications"),
-          where("userId", "==", user.uid),
-          where("careerId", "==", id)
-        );
-        const snap = await getDocs(q);
-        setHasApplied(!snap.empty);
-      } catch (error) {
-        console.error("Error checking application status:", error);
-      } finally {
-        setCheckingApplication(false);
-      }
+    if (careerError) {
+      router.replace("/careers");
     }
-    checkApplication();
-  }, [user, id]);
+  }, [careerError, router]);
+
+  const { data: hasAppliedResponse, isLoading: checkingApplication } = useSWR(
+    user && id ? ["app_status", user.uid, id] : null,
+    checkApplicationStatus
+  );
+
+  const hasApplied = hasAppliedResponse || false;
 
   if (loading) {
     return (

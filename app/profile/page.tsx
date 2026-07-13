@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { auth, db } from "@/lib/firebase";
@@ -10,45 +11,55 @@ import { reveal, stagger } from "@/lib/animations";
 import { Loader2, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const fetchProfileAndApps = async ([_, uid]: [string, string]) => {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists() || !docSnap.data().onboardingCompleted) {
+    throw new Error("NeedsOnboarding");
+  }
+
+  const q = query(collection(db, "applications"), where("userId", "==", uid));
+  const appSnap = await getDocs(q);
+  const appsData = appSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  appsData.sort((a: any, b: any) => (b.submittedAt?.toMillis() || 0) - (a.submittedAt?.toMillis() || 0));
+
+  return {
+    profile: docSnap.data(),
+    applications: appsData,
+  };
+};
+
 export default function ProfilePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
-  const [applications, setApplications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  
+  const [user, setUser] = useState<any>(undefined);
   const [tab, setTab] = useState<"details" | "applications">("details");
   const [expandedApp, setExpandedApp] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       if (currentUser) {
-        try {
-          const docRef = doc(db, "users", currentUser.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists() && docSnap.data().onboardingCompleted) {
-            setProfile(docSnap.data());
-          } else {
-            router.push("/onboarding");
-            return;
-          }
-
-          // Fetch applications
-          const q = query(collection(db, "applications"), where("userId", "==", currentUser.uid));
-          const appSnap = await getDocs(q);
-          const appsData = appSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-          appsData.sort((a: any, b: any) => (b.submittedAt?.toMillis() || 0) - (a.submittedAt?.toMillis() || 0));
-          setApplications(appsData);
-
-        } catch (error) {
-          console.error(error);
-        }
+        setUser(currentUser);
       } else {
         router.push("/");
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, [router]);
+
+  const { data, error, mutate } = useSWR(
+    user ? ["profile_data", user.uid] : null,
+    fetchProfileAndApps
+  );
+
+  useEffect(() => {
+    if (error && error.message === "NeedsOnboarding") {
+      router.push("/onboarding");
+    }
+  }, [error, router]);
+
+  const profile = data?.profile || null;
+  const applications = data?.applications || [];
+  const loading = user === undefined || (!data && !error);
 
   async function handleLogout() {
     await auth.signOut();
@@ -59,7 +70,9 @@ export default function ProfilePage() {
     if (!confirm("Are you sure you want to withdraw this application? This cannot be undone.")) return;
     try {
       await deleteDoc(doc(db, "applications", appId));
-      setApplications(prev => prev.filter(app => app.id !== appId));
+      if (data) {
+        mutate({ ...data, applications: data.applications.filter(app => app.id !== appId) }, false);
+      }
     } catch (error) {
       console.error("Failed to withdraw", error);
       alert("Failed to withdraw application.");

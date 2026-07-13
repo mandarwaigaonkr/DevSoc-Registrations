@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -22,39 +23,18 @@ interface Career {
   weeklyCommitment?: string;
 }
 
+const fetchCareers = async () => {
+  const querySnapshot = await getDocs(query(collection(db, "careers"), where("status", "==", "Published")));
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as Career[];
+};
+
 export default function CareersPage() {
-  const [careers, setCareers] = useState<Career[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const { data: careers, isLoading: loading } = useSWR("published_careers", fetchCareers);
 
-  useEffect(() => {
-    async function fetchCareers() {
-      try {
-        const querySnapshot = await getDocs(query(collection(db, "careers"), where("status", "==", "Published")));
-        const careersData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Career[];
-        setCareers(careersData);
-      } catch (error) {
-        console.error("Error fetching careers:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCareers();
-  }, []);
-
-  const filteredCareers = careers.filter(career => {
-    const title = career.title || "";
-    const location = career.location || "";
-    const dept = career.department || "";
-    const queryStr = searchQuery.toLowerCase();
-    
-    return title.toLowerCase().includes(queryStr) || 
-           location.toLowerCase().includes(queryStr) ||
-           dept.toLowerCase().includes(queryStr);
-  });
+  const filteredCareers = careers || [];
 
   return (
     <main className="min-h-screen bg-[#f8f9fa] pt-28 pb-24">
@@ -71,44 +51,12 @@ export default function CareersPage() {
               </>
             )}
           </div>
-          {searchQuery && (
-            <button 
-              onClick={() => setSearchQuery("")}
-              className="self-start rounded-pill border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50 md:self-auto"
-            >
-              Clear filters
-            </button>
-          )}
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[280px_1fr]">
+        <div className="grid grid-cols-1">
           
-          {/* Left Sidebar Filters */}
-          <aside className="sticky top-28 flex flex-col gap-0 border-r border-zinc-200 pr-6 hidden md:flex">
-            <div className="relative mb-6">
-              <input 
-                type="text" 
-                placeholder="What role are you looking for?" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-zinc-200 bg-white p-4 text-base text-zinc-800 shadow-sm outline-none transition focus:border-accent"
-              />
-            </div>
-          </aside>
-
           {/* Main Content - Job Listings */}
           <div className="flex flex-col gap-6">
-
-            {/* Mobile Search Box */}
-            <div className="relative md:hidden">
-              <input 
-                type="text" 
-                placeholder="What role are you looking for?" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-zinc-200 bg-white p-4 text-base text-zinc-800 shadow-sm outline-none transition focus:border-accent"
-              />
-            </div>
 
             <AnimatePresence mode="popLayout">
               {loading ? (
