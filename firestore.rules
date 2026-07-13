@@ -38,10 +38,8 @@ service cloud.firestore {
     match /applications/{appId} {
       // User must be authenticated
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      // Allow user to read/update their own application, or admins to read/update all
-      allow read, update: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
-      // Only admins can delete
-      allow delete: if isAdmin();
+      // Allow user to read/update/delete their own application, or admins to read/update/delete all
+      allow read, update, delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
   }
 }

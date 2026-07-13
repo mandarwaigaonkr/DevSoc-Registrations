@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc, collection, query, where, getDocs, deleteDoc } from "firebase/firestore";
-import { Button } from "@/components/ui/Button";
 import { reveal, stagger } from "@/lib/animations";
 import { Loader2, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,7 @@ const fetchProfileAndApps = async ([_, uid]: [string, string]) => {
 
   const q = query(collection(db, "applications"), where("userId", "==", uid));
   const appSnap = await getDocs(q);
-  const appsData = appSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const appsData = appSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
   appsData.sort((a: any, b: any) => (b.submittedAt?.toMillis() || 0) - (a.submittedAt?.toMillis() || 0));
 
   return {

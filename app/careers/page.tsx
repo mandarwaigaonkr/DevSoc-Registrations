@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
