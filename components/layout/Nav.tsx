@@ -103,6 +103,8 @@ export function Nav() {
   if (user) navLinks.push({ label: "Campus Recruitment", href: "/careers", requireAdmin: false });
   if (isAdmin) navLinks.push({ label: "Admin", href: "/admin/dashboard", requireAdmin: true });
 
+  if (pathname === "/flyer") return null;
+
   return (
     <motion.header
       variants={navMount}
